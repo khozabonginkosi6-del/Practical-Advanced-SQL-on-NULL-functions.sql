@@ -1,186 +1,62 @@
-📘 Advanced SQL on NULL Functions
-📌 Overview
-This project demonstrates advanced SQL techniques for handling NULL values in retail shopping trend data. The queries showcase:
+# 📘 Advanced SQL on NULL Functions
 
-Filtering missing values
+## 📌 Summary of the Case Study
+This case study demonstrates how **advanced SQL techniques** can be applied to handle **NULL values** in retail shopping trend data. The project focused on filtering missing values, replacing NULLs with defaults, classifying records using CASE statements, and performing aggregations with conditions. The goal was to transform incomplete raw data into **business insights** such as customer segmentation, purchase behavior, and review analysis.
 
-Replacing NULLs with defaults using IFNULL
+---
 
-Classifying records with CASE
+## 🔍 How the Case Study Was Done
+1. **Dataset Exploration**
+   - Source: `MYDATABASE.PUBLIC.SHOPING_TREND_01`
+   - Example columns:  
+     `customer_id`, `size`, `purchase_amount`, `item_purchased`, `season`,  
+     `payment_method`, `promo_code_used`, `review_rating`, `shipping_type`,  
+     `location`, `color`, `previous_purchases`, `frequency_of_purchases`,  
+     `category`, `age`, `gender`.
 
-Aggregating and grouping with conditions
+2. **SQL Query Development**
+   - Designed **20 targeted queries** to address specific business questions:
+     - Customers with missing size but purchase amount > 50.
+     - Purchases grouped by season, replacing NULLs with "Unknown Season".
+     - Payment method counts with NULLs treated as "Not Provided".
+     - Classification of spenders (High, Medium, Low) using CASE + IFNULL.
+     - Top 5 locations by purchase amount, replacing NULLs with 0.
+     - Average review ratings per category, handling NULLs and filtering > 3.5.
+     - Delivery speed classification using CASE logic.
+     - Identification of customers with missing promo codes, shipping types, or review ratings.
 
-Business insights such as customer segmentation, purchase behavior, and review analysis
+3. **NULL Handling Techniques**
+   - **IFNULL / COALESCE** → Replace missing values with defaults.  
+   - **CASE WHEN** → Classify records and handle conditional logic.  
+   - **Aggregations** → SUM, AVG, COUNT with conditions to exclude or include NULLs.  
+   - **Filtering** → Queries designed to highlight missing or incomplete data.  
 
-🛠️ Requirements
-SQL-compatible database (Snowflake, BigQuery, PostgreSQL, MySQL, SQL Server, Oracle, etc.)
+---
 
-Dataset:
+## 📊 Insights Found
+- Customers with missing attributes (e.g., size, promo codes) still contributed significantly to sales.  
+- Seasonal grouping revealed that **NULL seasons** represented a notable portion of transactions, requiring classification as "Unknown Season".  
+- Payment method analysis showed gaps where customers did not provide details, highlighting areas for improved data capture.  
+- **Spender classification** identified high-value customers even when purchase amounts were partially missing.  
+- Location-based analysis revealed **top-performing regions**, while NULL handling ensured accurate revenue calculations.  
+- Review ratings analysis showed that handling NULLs was critical to avoid skewed averages and to identify categories with strong customer satisfaction.  
+- Delivery speed classification provided insights into customer preferences for shipping methods.  
 
-Code
-MYDATABASE.PUBLIC.SHOPING_TREND_01
-Example columns:
+---
 
-customer_id
+## 🎯 Summary of Findings
+By systematically handling NULL values, the project transformed incomplete retail data into **reliable insights**. The analysis uncovered:  
+- Customer behavior patterns despite missing attributes.  
+- Seasonal and regional sales trends.  
+- Payment and promo code usage gaps.  
+- Correlations between spending, reviews, and purchase frequency.  
 
-size
+This demonstrates how **advanced SQL functions** can improve data quality and deliver **business intelligence** that supports decision-making in **marketing, customer engagement, and inventory management**.
 
-purchase_amount
+---
 
-item_purchased
+## 🛠️ Tools Used
+- **SQL-compatible databases** (Snowflake, BigQuery, PostgreSQL, MySQL, SQL Server, Oracle)  
+- **T-SQL / SQL functions** (IFNULL, COALESCE, CASE, SUM, AVG, COUNT, GROUP BY)  
+- **Optional Visualization Tools**: Power BI, Excel (pivot tables, dashboards)  
 
-season
-
-payment_method
-
-promo_code_used
-
-review_rating
-
-shipping_type
-
-location
-
-color
-
-previous_purchases
-
-frequency_of_purchases
-
-category
-
-age
-
-gender
-
-📂 Queries
-1. 🔎 Missing Size & Purchase > 50
-sql
-SELECT customer_id, size, purchase_amount, item_purchased
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-WHERE size IS NULL AND purchase_amount > 50;
-2. 📅 Purchases by Season (NULL → Unknown)
-sql
-SELECT COUNT(*) AS total_purchases,
-       IFNULL(season,'unknown season') AS season_new
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-GROUP BY IFNULL(season,'unknown season');
-3. 💳 Customers by Payment Method (NULL → Not Provided)
-sql
-SELECT COUNT(*) AS customer_count,
-       IFNULL(payment_method,'not provided') AS payment_method
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-GROUP BY payment_method;
-4. 🎟️ Missing Promo Code & Low Rating
-sql
-SELECT customer_id, promo_code_used, review_rating, item_purchased
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-WHERE promo_code_used IS NULL AND review_rating < 3.0;
-5. 🚚 Average Purchase by Shipping Type (NULL → 0)
-sql
-SELECT shipping_type,
-       AVG(IFNULL(purchase_amount,0)) AS Average_purchase_amount
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-GROUP BY shipping_type;
-6. 📍 Purchases per Location (>5, Non-NULL Payment)
-sql
-SELECT location, COUNT(*) AS total_purchases
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-WHERE payment_method IS NOT NULL
-GROUP BY location
-HAVING COUNT(*) > 5;
-7. 💵 Spender Category (CASE + NULL Handling)
-sql
-SELECT customer_id,
-       IFNULL(purchase_amount,0) AS purchase_amount,
-       CASE
-         WHEN IFNULL(purchase_amount,0) > 80 THEN 'High'
-         WHEN IFNULL(purchase_amount,0) BETWEEN 50 AND 80 THEN 'Medium'
-         ELSE 'Low'
-       END AS spender_category
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01;
-8. 🎨 Customers with Color Not NULL & Previous Purchases NULL
-sql
-SELECT customer_id, color, previous_purchases
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-WHERE color IS NOT NULL AND previous_purchases IS NULL;
-9. 🔄 Group by Frequency of Purchases
-sql
-SELECT frequency_of_purchases, COUNT(*) AS total_purchase_amount
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-GROUP BY frequency_of_purchases;
-10. 🛍️ Purchases per Category (Exclude NULL)
-sql
-SELECT category, COUNT(*) AS total_purchases
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-WHERE category IS NOT NULL
-GROUP BY category;
-11. 📍 Top 5 Locations by Purchase Amount
-sql
-SELECT location,
-       SUM(IFNULL(purchase_amount,0)) AS Total_purchase_amount
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-GROUP BY location
-ORDER BY Total_purchase_amount DESC
-LIMIT 5;
-12. 🚻 Entries with NULL Color by Gender & Size
-sql
-SELECT gender, size, COUNT(*) AS number_entries
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-WHERE color IS NULL
-GROUP BY gender, size;
-13. 📦 Items with >3 NULL Shipping Type
-sql
-SELECT item_purchased, COUNT(*) AS null_shipping_type_count
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-WHERE shipping_type IS NULL
-GROUP BY item_purchased
-HAVING COUNT(*) > 3;
-14. 💳 Payment Method with NULL Review Rating
-sql
-SELECT payment_method, COUNT(*) AS missing_review_rating_count
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-WHERE review_rating IS NULL
-GROUP BY payment_method;
-15. ⭐ Average Review Rating per Category (>3.5)
-sql
-SELECT category,
-       AVG(IFNULL(review_rating,0)) AS average_review_rating
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-GROUP BY category
-HAVING AVG(IFNULL(review_rating,0)) > 3.5;
-16. 🎨 Colors Missing in ≥2 Rows + Avg Age
-sql
-SELECT color, AVG(age) AS Average_age
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-WHERE color IS NULL
-GROUP BY color
-HAVING COUNT(*) >= 2;
-17. 🚚 Delivery Speed Classification
-sql
-SELECT COUNT(*) AS customer_count,
-       CASE
-         WHEN shipping_type IN ('Express','Next Day Air') THEN 'Fast'
-         WHEN shipping_type = 'Standard' THEN 'Slow'
-         ELSE 'Other'
-       END AS delivery_speed
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-GROUP BY delivery_speed;
-18. 🎟️ Promo Code = Yes & Purchase Amount NULL
-sql
-SELECT customer_id, promo_code_used, purchase_amount
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-WHERE purchase_amount IS NULL AND promo_code_used = 'Yes';
-19. 📍 Max Previous Purchases per Location (Avg Rating > 4.0)
-sql
-SELECT location,
-       MAX(IFNULL(previous_purchases,0)) AS Max_previous_purchase,
-       AVG(review_rating) AS average_review_rating
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-GROUP BY location
-HAVING AVG(review_rating) > 4.0;
-20. 🚚 NULL Shipping Type + Purchase Between 30–70
-sql
-SELECT customer_id, shipping_type, purchase_amount, item_purchased
-FROM MYDATABASE.PUBLIC.SHOPING_TREND_01
-WHERE shipping_type IS NULL AND purchase_amount BETWEEN 30 AND 70
